@@ -22,12 +22,11 @@ const char pinName[NUM_KEYS] = {
 };
 
 // Stores value of all keys for this loop
-bool keyState[NUM_KEYS];
+keyboard_data cur_asetniop;
 
-keyboard_state asetniop;
+// Used to compare data as it changes, used for several things.
+keyboard_data last_asetniop;
 
-// Stores states of all keys in current chord.
-bool keyBuffer[NUM_KEYS];
 
 String toPrint;
 
@@ -35,55 +34,68 @@ String toPrint;
 void setup()
 {
   Serial.begin(9600);
-  // For all items in pinout arr, set as input.
+
+  asetniop.chord = 0;
+  asetniop.keymap = 0;
   for(int i = 0; i < NUM_KEYS; i++)
   {
     pinMode(pin[i], INPUT);
-    // set default values of both arrays. Ensures the initial loop won't cause a key event.
-    
+    asetniop.keymap |= digitalRead(pin[i]) << i;
   }
+  Serial.println(asetniop.keyState);
   // Temporary jenk
   toPrint = String();
 }
 
 void loop()
 {
-  // Get data from buttons, store in array or bitmap (TODO?)
+  next_keymap = 0; // prepare byte for incoming data
   for(int i = 0; i < NUM_KEYS; i++)
   {
-    keySample = digitalRead(pin[i]); 
-    if(keySample != keyState[i]) keyChange = true;
-    keyState[i] = keySample;
+    asetniop.keymap |= digitalRead(pin[i]) << i;
   }
+  
+ 
 
+
+  
   // If button change:
-  if(keyChange)
+  if(asetniop.keymap != last_asetniop.keymap)
   {
     
-    // Loop through all buttons, if a key is high, append to keyBuffer.
-    for(int i = 0; i < NUM_KEYS; i++)
+    // If no keys currently pressed
+    if(asetniop.keymap == 0)
     {
-      
+      // compute chord here
+      Serial.println("display chord");
+      asetniop.chord = 0;
     }
+
+    //TODO: If chord shape is backspace, set flag and start key event.
 
 
     
-    //TODO: If chord shape is backspace, start key event. Set a flag.
 
 
     //TODO: If chord shape is no longer backspace or 1 of the keys was released, end key event
+
+
     
     // If all keys off after loop, clear keyBuffer and print char associated with buffer
     for(int i = 0; i < NUM_KEYS; i++)
     {
-      toPrint = /*String(pinnames[i]) + ": " +*/ keyPressed[i];
+      toPrint = keyPressed[i];
       if(keyPressed[i])
       {
         Serial.print(pinName[i]);
       }
     }
     Serial.println("");
+    last_asetniop = asetniop;
   }
-  keyChange = false;
+
+
+  // can be moved inside the loop later on.
+ 
   delay(50);
 }
