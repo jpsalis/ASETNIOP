@@ -14,20 +14,22 @@ def main():
 
     for key in js:
         temp = js[key]
-        
-        output.insert(x, {})
+        index = int(key)
+        output.insert(index, {})
+        # FINAL GOAL: 
         for pair in lookup:
-            
-            output[x][pair[1]] = temp.get(pair[0])[0] if pair[0] in js[key].keys() else "";
+            if index == 0:
+                continue
+            output[index][pair[0]] = temp.get(pair[1])[0] if pair[1] in js[key].keys() else "";
             
 
-    for item in output:
-        print(item)
+    for i in range(len(output)):
+        print(f"{i:08b}: {output[i]}")
 
     return 0
 
 
-
+def swap(
 
 if __name__ == "__main__":
     main()
