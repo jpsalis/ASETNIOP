@@ -1,21 +1,18 @@
-#include <ctype.h>
 #include "lookup.h"
+#include <ctype.h>
 // C++ code
-//
-#define NUM_KEYS 8
 /*   _____   _____
     |aset | | niop|
-    \____*| |*____/
+    \___sp| |sh___/
 */
 
-
+// PINS
 // TODO: may not need the character name in the struct for future reference.
 const key keys[NUM_KEYS] = {
   {'a', 2}, {'s', 3}, {'e', 4}, {'t', 5}, 
   {'n', 9}, {'i', 10}, {'o', 11}, {'p', 12}
 };
 
-// Plan to think of more permanent solution to this, but as a special case, it makes sense to give them their own pins.
 const uint8_t shift_pin = 6;
 const uint8_t space_pin = 8; 
 
@@ -23,37 +20,43 @@ const uint8_t space_pin = 8;
 keyboard_obj asetniop;
 keyboard_obj last_asetniop;
 
-
-
 void setup()
 {
   Serial.begin(9600);
-
+  
   last_asetniop.chord = asetniop.chord = 0;
   last_asetniop.keymap = asetniop.keymap = 0;
+
+  // DECLARING PINMODES:
+  pinMode(shift_pin, INPUT);
+  pinMode(space_pin, INPUT);
   for(int i = 0; i < NUM_KEYS; i++)
   {
     pinMode(keys[i].pin, INPUT);
+    // TODO: Possibly make this a function since this line is repeated later.
     asetniop.keymap |= digitalRead(keys[i].pin) << i;
   }
-  Serial.println(asetniop.keymap);
 }
+
+
+
 
 void loop()
 {
+  
   // UPDATE KEYMAP
-  uint8_t temp;
+  
   asetniop.keymap = 0; // prepare byte for incoming data
   for(int i = 0; i < NUM_KEYS; i++)
   {
     // set bit in the map
-    temp = digitalRead(keys[i].pin) << i;
-    asetniop.keymap |= temp;
+    
+    asetniop.keymap |= digitalRead(keys[i].pin) << i;
   }
 
   
   // DETECT KEYCHANGES
-  if(asetniop.keymap != last_asetniop.keymap)
+  if(keyDiff(asetniop, last_asetniop))
   {
     // append any new keys to the chord.
     asetniop.chord |= asetniop.keymap;
@@ -63,8 +66,17 @@ void loop()
     {
       // compute chord here
       Serial.print("chord: ");
-      Serial.println(asetniop.chord, BIN);
+      if(numHighBits(asetniop.chord) <= 2)
+      {
+        Serial.println(chordLookup[asetniop.chord + 1].lett.base);
+      }
+      else
+      {
+        Serial.println(chordLookup[asetniop.chord + 1].dict.lp);
+      }
       asetniop.chord = 0;
+      Serial.print("space: ");
+      Serial.println(asetniop.spaceDown);
     }
 
     //TODO: If chord shape is backspace, set flag and start key event.
@@ -74,8 +86,29 @@ void loop()
     last_asetniop = asetniop;
   }
 
-
-  // can be moved inside the loop later on.
- 
+  // TODO: ?Possibly synchronize the output of the keyboard timewise with some sort of delta t. 
   delay(50);
+}
+
+
+
+
+// Detect differences between
+bool keyDiff(keyboard_obj cur, keyboard_obj last)
+{
+  if (cur.keymap != last.keymap || cur.spaceDown != last.spaceDown) 
+    return true;
+  
+  return false;
+}
+
+// Counts number of flipped bits in number and returns to user. there's probably a more efficient way to do this i'm sure, just not sure offhand.
+uint8_t numHighBits(uint8_t num)
+{
+  int r_val = 0;
+  for(int i = 0; i < 8; i++)
+  {
+    if(num & (1 << i)) r_val++;
+  }
+  return r_val;
 }

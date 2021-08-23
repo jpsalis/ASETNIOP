@@ -2,8 +2,11 @@ import json
 import sys
 
 DEF = ""
-lookup = [('lw', 'tlw'), ('rw', 'trw'), ('lp', 'tlp'), ('rp', 'trp')]
+lookup = [('base', 'base'), ('baseshift', 'baseshift'),('lp', 'tlp'), ('rp', 'trp')]
 
+
+# FINAL GOAL: Array of 255 elements, each storing data about that keypress.
+# IMPORTANT: B/C 0b0000.0000 serves no purpose, the array can be shifted 1 element, so 0000.0000 becomes 0000.0001, so on.
 def main():
     with open('asetniop.txt') as f:
         data = f.read()
@@ -13,23 +16,29 @@ def main():
     output = []
 
     for key in js:
-        temp = js[key]
         index = int(key)
-        output.insert(index, {})
-        # FINAL GOAL: 
-        for pair in lookup:
-            if index == 0:
-                continue
-            output[index][pair[0]] = temp.get(pair[1])[0] if pair[1] in js[key].keys() else "";
+        if index == 0:
+            continue
             
+        temp = js[key]
+        output.insert(index - 1, {})
 
-    for i in range(len(output)):
-        print(f"{i:08b}: {output[i]}")
+        
+        
+        for pair in lookup:
+            output[0]['base'] = js['1'].get('base')[0] 
+
+
+
+            #output[index - 1][pair[0]] = temp.get(pair[1])[0] if pair[1] in js[key].keys() else ""
+            if pair[1] in js[key].keys():
+                output[index - 1][pair[0]] = temp.get(pair[1])[0]
+                        
+        print(f"{index:08b}: {output[index-1]}")
 
     return 0
 
 
-def swap(
 
 if __name__ == "__main__":
     main()
