@@ -1,9 +1,8 @@
 #include "lookup.h"
 
 
-
-
-const chordShape chordLookup[TABLESIZE] PROGMEM = {
+//TODO: get table to work with progmem. Currently able to access data but takes up w a a a y too much space.
+/*const*/ chordShape chordLookup[TABLESIZE] /*PROGMEM*/= {
   {{'a', 'A'}},
   {{'s', 'S'}},
   {{'w', 'W'}},
@@ -20,3 +19,8 @@ const chordShape chordLookup[TABLESIZE] PROGMEM = {
   {.dict = {"ce" , "", "set"  , ""}},
   {.dict = {"wer", "", "were", ""}}
 };
+
+
+chordShape getChord(uint8_t shape) {
+  return chordLookup[shape - 1];
+}

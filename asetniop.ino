@@ -54,7 +54,6 @@ void loop()
     asetniop.keymap |= digitalRead(keys[i].pin) << i;
   }
 
-  
   // DETECT KEYCHANGES
   if(keyDiff(asetniop, last_asetniop))
   {
@@ -68,15 +67,16 @@ void loop()
       Serial.print("chord: ");
       if(numHighBits(asetniop.chord) <= 2)
       {
-        Serial.println(chordLookup[asetniop.chord + 1].lett.base);
+        Serial.println(getChord(asetniop.chord).lett.base);
       }
       else
       {
-        Serial.println(chordLookup[asetniop.chord + 1].dict.lp);
+        Serial.println(getChord(asetniop.chord).dict.lp);
       }
       asetniop.chord = 0;
       Serial.print("space: ");
       Serial.println(asetniop.spaceDown);
+      Serial.println();
     }
 
     //TODO: If chord shape is backspace, set flag and start key event.
