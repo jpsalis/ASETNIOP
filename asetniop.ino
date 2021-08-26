@@ -1,9 +1,11 @@
 #include "lookup.h"
 #include <ctype.h>
-// C++ code
-/*   _____   _____
-    |aset | | niop|
-    \___sp| |sh___/
+
+/*   
+ *  Layout:
+ *   _____   _____
+ *  |aset | | niop|
+ *  \___sp| |sh___/
 */
 
 // PINS
@@ -13,12 +15,14 @@ const key keys[NUM_KEYS] = {
   {'n', 9}, {'i', 10}, {'o', 11}, {'p', 12}
 };
 
-const uint8_t shift_pin = 6;
-const uint8_t space_pin = 8; 
+const uint8_t space_pin = 6; 
+const uint8_t shift_pin = 8;
 
 // Store state of keyboard. Names self-explanatory.
 keyboard_obj asetniop;
 keyboard_obj last_asetniop;
+
+
 
 void setup()
 {
@@ -30,6 +34,7 @@ void setup()
   // DECLARING PINMODES:
   pinMode(shift_pin, INPUT);
   pinMode(space_pin, INPUT);
+  
   for(int i = 0; i < NUM_KEYS; i++)
   {
     pinMode(keys[i].pin, INPUT);
@@ -43,16 +48,16 @@ void setup()
 
 void loop()
 {
-  
   // UPDATE KEYMAP
-  
   asetniop.keymap = 0; // prepare byte for incoming data
   for(int i = 0; i < NUM_KEYS; i++)
   {
     // set bit in the map
-    
     asetniop.keymap |= digitalRead(keys[i].pin) << i;
   }
+
+  // Set space state if it's held down
+  asetniop.
 
   // DETECT KEYCHANGES
   if(keyDiff(asetniop, last_asetniop))
@@ -91,7 +96,7 @@ void loop()
 }
 
 
-
+//FUNCTIONS:
 
 // Detect differences between
 bool keyDiff(keyboard_obj cur, keyboard_obj last)
@@ -101,6 +106,8 @@ bool keyDiff(keyboard_obj cur, keyboard_obj last)
   
   return false;
 }
+
+
 
 // Counts number of flipped bits in number and returns to user. there's probably a more efficient way to do this i'm sure, just not sure offhand.
 uint8_t numHighBits(uint8_t num)

@@ -2,7 +2,7 @@ import json
 import sys
 
 DEF = ""
-lookup = [('base', 'base'), ('baseshift', 'baseshift'),('lp', 'tlp'), ('rp', 'trp')]
+lookup = [('base', 'base'), ('baseshift', 'baseshift'),('lp', 'tlp'), ('rp', 'trp'), ('lw', 'tlw'), ('rw', 'trw')]
 
 
 # FINAL GOAL: Array of 255 elements, each storing data about that keypress.
@@ -11,33 +11,36 @@ def main():
     with open('asetniop.txt') as f:
         data = f.read()
 
-    js = json.loads(data)
+    data = json.loads(data)
 
     output = []
-
-    for key in js:
+    max_len = {}
+    for key in data:
         index = int(key)
         if index == 0:
             continue
-            
-        temp = js[key]
+
+        # Insert a new row for new data to be entered.
         output.insert(index - 1, {})
 
-        
-        
+        # Loop through selections in lookup match table. Append to output if it's in the original table
         for pair in lookup:
-            output[0]['base'] = js['1'].get('base')[0] 
+            if pair[1] in data[key].keys():
+                word = data[key].get(pair[1])[0]
+                
+                output[index - 1][pair[0]] = word
+                
+                # Find longest of each lookup pair, set length if longer or doesn't exist yet.
+                if pair[0] not in max_len or max_len[pair[0]] < len(word):
+                    max_len[pair[0]] = len(word)
 
-
-
-            #output[index - 1][pair[0]] = temp.get(pair[1])[0] if pair[1] in js[key].keys() else ""
-            if pair[1] in js[key].keys():
-                output[index - 1][pair[0]] = temp.get(pair[1])[0]
+                
                         
         print(f"{index:08b}: {output[index-1]}")
 
+    print(max_len)
     return 0
-
+        
 
 
 if __name__ == "__main__":
