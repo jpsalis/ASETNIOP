@@ -22,8 +22,6 @@ const uint8_t shift_pin = 8;
 keyboard_obj asetniop;
 keyboard_obj last_asetniop;
 
-
-
 void setup()
 {
   Serial.begin(9600);
@@ -44,8 +42,6 @@ void setup()
 }
 
 
-
-
 void loop()
 {
   // UPDATE KEYMAP
@@ -55,32 +51,42 @@ void loop()
     // set bit in the map
     asetniop.keymap |= digitalRead(keys[i].pin) << i;
   }
-
-  // Set space state if it's held down
-  asetniop.
+  
+  asetniop.spaceDown = digitalRead(space_pin);
+  
 
   // DETECT KEYCHANGES
   if(keyDiff(asetniop, last_asetniop))
   {
     // append any new keys to the chord.
     asetniop.chord |= asetniop.keymap;
-    
+    asetniop.isWord |= asetniop.spaceDown;
+
+
+    // TODO: figure out how to get space key to cooperate with chord. Should print after the word
     // If no keys currently pressed
-    if(asetniop.keymap == 0)
+    if(!keyHeld(asetniop))
     {
-      // compute chord here
-      Serial.print("chord: ");
-      if(numHighBits(asetniop.chord) <= 2)
-      {
-        Serial.println(getChord(asetniop.chord).lett.base);
+      // Display chord.
+      if(asetniop.chord != 0) {
+        Serial.print("chord: ");
+        if(numHighBits(asetniop.chord) <= 2)
+        {
+          Serial.println(getChord(asetniop.chord).lett.base);
+        }
+        else
+        {
+          Serial.println(getChord(asetniop.chord).dict.lp);
+        }
+        asetniop.chord = 0;
       }
-      else
+
+      // Display space after word.
+      if(asetniop.isWord)
       {
-        Serial.println(getChord(asetniop.chord).dict.lp);
+        Serial.print("space down");
+        asetniop.isWord = false;
       }
-      asetniop.chord = 0;
-      Serial.print("space: ");
-      Serial.println(asetniop.spaceDown);
       Serial.println();
     }
 
@@ -98,16 +104,16 @@ void loop()
 
 //FUNCTIONS:
 
-// Detect differences between
-bool keyDiff(keyboard_obj cur, keyboard_obj last)
+// Check if any key differences observed.
+bool keyDiff(keyboard_obj cur, keyboard_obj last) 
 {
-  if (cur.keymap != last.keymap || cur.spaceDown != last.spaceDown) 
-    return true;
-  
-  return false;
+  return (cur.keymap != last.keymap || cur.spaceDown != last.spaceDown);
 }
 
-
+bool keyHeld(keyboard_obj a)
+{
+  return a.spaceDown || a.keymap;
+}
 
 // Counts number of flipped bits in number and returns to user. there's probably a more efficient way to do this i'm sure, just not sure offhand.
 uint8_t numHighBits(uint8_t num)
