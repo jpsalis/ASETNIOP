@@ -4,7 +4,7 @@ A keyboard concept and layout designed by Zach Dennis in 2012. Its goal is to si
 My design is a hardware-based implementation of the layout. Existing hardware based solutions have been created in the past by other individuals, but I wanted to challenge myself to create a similar creation from scratch, while improving my proficiency at programming microcontrollers, and possibly refine certain details of the layout while i'm at it.
 
 ## Design Considerations
-1. Design must work as a standard HID peripheral with no additional drivers. In effect, it should be plug-and-play. This almost instantly excludes certain microcontrollers that don't come equipped with hardware USB peripheral abilities.
+1. Design must work as a standard HID peripheral with no additional drivers. In effect, it should be plug-and-play. This almost instantly excludes certain microcontrollers that don't come equipped with hardware USB peripheral abilities. Including my original prototype board, the atmega328p used in the Arduino Uno.
 2. Due to the nature of the keyboard layout, it will be ultimately setup as a split keyboard, connected by a sort of cable between the two modules. My intention is to use a headphone cable to transmit the I2C protocol, with the right keyboard sending telemetry data back to the left side upon request to be processed.
 
 
