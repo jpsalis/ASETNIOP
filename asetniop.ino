@@ -62,32 +62,29 @@ void loop()
     asetniop.chord |= asetniop.keymap;
     asetniop.isWord |= asetniop.spaceDown;
 
-
     // If no keys currently pressed
     if(!keyHeld(asetniop))
     {
       // PRINT CHORD
       if(asetniop.chord != 0) {
-        Serial.print("chord: ");
+        
         if(numHighBits(asetniop.chord) <= 2)
         {
-          Serial.println(getData(asetniop.chord).lett.base);
+          Serial.print("Lett:  ");
+          Serial.print(getData(asetniop.chord).lett.base);
         }
         else
         {
-          char * temp;
-          getChord(getData(asetniop.chord), temp);
-
-          else(
-            Serial.println(getData(asetniop.chord).dict.lp);
+          Serial.print("Chord: ");
+          putChord(asetniop, getData(asetniop.chord));
         }
         asetniop.chord = 0;
+        Serial.println();
       }
-
       // PRINT SPACE
       if(asetniop.isWord)
       {
-        Serial.print("space down");
+        Serial.println("space down");
         asetniop.isWord = false;
       }
       Serial.println();
@@ -97,24 +94,17 @@ void loop()
     //TODO: If chord shape is no longer backspace or 1 of the keys was released, end key event.
     last_asetniop = asetniop;
   }
-
   // TODO: ?Possibly synchronize the output of the keyboard timewise with some sort of delta t. 
   delay(50);
 }
 
 
 
-
 //FUNCTIONS:
 
-
-
 // Check if any key differences observed.
-bool keyDiff(keyboard_obj cur, keyboard_obj last) { return (cur.keymap != last.keymap || cur.spaceDown != last.spaceDown); }
-
-
-
-bool keyHeld(keyboard_obj a) {return a.spaceDown || a.keymap;}
+bool keyDiff (keyboard_obj cur, keyboard_obj last){  return (cur.keymap != last.keymap || cur.spaceDown != last.spaceDown);  }
+bool keyHeld (keyboard_obj a)                     {  return a.spaceDown || a.keymap;  }
 
 
 
@@ -122,10 +112,7 @@ bool keyHeld(keyboard_obj a) {return a.spaceDown || a.keymap;}
 uint8_t numHighBits(uint8_t num)
 {
   int toReturn = 0;
-  for(int i = 0; i < 8; i++)
-  {
-    if(num & (1 << i)) toReturn++;
-  }
+  for(int i = 0; i < 8; i++)  if(num & (1 << i))  toReturn++;
   return toReturn;
 }
 
@@ -133,23 +120,26 @@ uint8_t numHighBits(uint8_t num)
 
 // Given an index, return a string that will be printed to the user. May need to add additional functionality later on.
 
-/* primary states:
+/*
+ * PARAMS:
+ *   - keyData: State of keyboard.
+ *   - chordData: copy of a chord from lookup table
+ *   
+ * FUNCTION: Display relavant   
  * 0b00: lp
  * 0b01: rp
  * 0b10: lw
  * 0b11: rw
  */
 
-/* 
- *  Primary: Number from 0 to 4 indicating the 
- */
-bool putChord(const chordShape data) {
+
+bool putChord(const keyboard_obj keyData, const chordShape chordData) {
   uint8_t primary = 0;
-  primary |= (asetniop.primary == 'r');
-  primary |= asetniop.isWord << 1;
+  primary |= (keyData.bias == 'r');
+  primary |= keyData.isWord << 1;
 
   /* this is some clever bit of math I'm pretty proud of. 
-   *  xor'ing my primary state with the digits 0-4 gives me the priority order I want for every possible primary.
+   * xor'ing the primary state with the digits 0-4 gives me the priority order I want for every possible primary.
    * Imagine primary is 01, or RP. Order for others if no primary exists there should then go: 
    * RP (01), LP (00), RW (10)then LW (11). This behavior allows this design to function as intended.
    */
@@ -158,20 +148,25 @@ bool putChord(const chordShape data) {
   {
     switch (primary ^ i) {
       case LP:
-        output = String(data.lp);
+        output = String(chordData.dict.lp);
         break;
       case RP:
-        output = String(data.rp);
+        output = String(chordData.dict.rp);
         break;
       case LW:
-        output = String(data.lw);
+        output = String(chordData.dict.lw);
         break;
       case RW:
-        output = String(data.rw);
+        output = String(chordData.dict.rw);
         break;
     }
+    
     // Verify value
-    if (output != "") return true 
+    if (output != "") 
+    {
+      Serial.print(output);
+      return true;
+    }
   }
   // No chord found, error of some kind. Print some other way.
   return false;
