@@ -1,0 +1,32 @@
+lw: lw, rw, lp, rp
+rw: rw, lw, rp, lp
+lp: lp, rp, lw, rw
+rp: rp, lp, rw, lw
+
+
+lp: 00
+rp: 01
+lw: 10
+rw: 11
+
+
+lw: 10, 11, 00, 01
+rw: 11, 10, 01, 00
+lp: 00, 01, 10, 11
+rp: 01, 10, 11, 10
+
+Priority:
+orig digit
+flip 1's place
+flip both
+flip 1's place
+
+Count in the background, as count changes, XOR it with the index received from lookup.
+(oml I feel like an evil mastermind)
+
+lw:10
+
+0b10 ^ 0: 0b10
+0b10 ^ 1: 0b11
+0b10 ^ 2: 0b00
+0b10 ^ 3: 0b01

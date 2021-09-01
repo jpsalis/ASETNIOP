@@ -23,6 +23,11 @@
 #define UPPER   4
 #define LOWER_H 5
 
+// PARTIAL MODES
+#define LP 0
+#define RP 1
+#define LW 2
+#define RW 3
 /* switch example:
  *  
  *  lower
@@ -45,23 +50,14 @@ struct keyboard_obj{
   uint8_t keymap; // Stores all keys currently held. 1 = 'a', 2 = 's', so on
   uint8_t chord; // Stores state of chord, compared against lookup table later. 0 is meaningless, maps to -1 on the lookup table.
   bool    spaceDown; // stores current state of spaceKey
-  bool    isWord; // Stores state of space as a 
+  bool    isWord; // Used as a part of chord, 
+  char    bias; // Will be 'l' or 'r' depending on which side of the keyboard began the chord. The bias helps determine which chord from the lookup is active.
   
   // Special state detectors
   //char  backState; // Unused, stores state of backspace.
-  /* TODO: 
-   *  shift states 
-   *  depending on shift state and key being held, shift will enter different modes of operation. 
-   *  Primary print modes are:
-   *  0: Standard, print lowercase.
-   *  1: Capital word, first char or letter is put into uppercase mode.
-   *  2: Full caps.
-   */
   uint8_t shiftState; // 0: lowercase, 1: camel mode. first key caps. 2: caps lock.
-
   //TODO: Add methods to struct so user can interact with shift state in meaningful way. Methods like, isLower, isCamel, isUpper
 };
-
 
 // LOOKUP TABLE DEFINITION
 union chordShape{
@@ -71,7 +67,7 @@ union chordShape{
     char baseshift;
   }lett;
 
-  // I'd rather have character pointers but this seems like a necessary evil.
+  // Very large structure, necessary evil of progmem.
   struct d{
     char lp[MAX_PART_LEN];
     char rp[MAX_PART_LEN];
