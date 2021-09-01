@@ -64,7 +64,7 @@ void loop()
 
     // If no keys currently pressed
     if(!keyHeld(asetniop))
-    {
+    { 
       // PRINT CHORD
       if(asetniop.chord != 0) {
         
@@ -89,6 +89,11 @@ void loop()
       }
       Serial.println();
     }
+    // TODO: Set state of bias if current chord 
+    else if (/* CODE 
+
+    
+    
     //TODO: If chord shape is backspace, set flag and start key event.
 
     //TODO: If chord shape is no longer backspace or 1 of the keys was released, end key event.
