@@ -62,25 +62,36 @@ void loop()
     asetniop.chord |= asetniop.keymap;
     asetniop.isWord |= asetniop.spaceDown;
 
+
+    
     // If no keys currently pressed
     if(!keyHeld(asetniop))
     { 
-      // PRINT CHORD
+      // PRINT CHORD:      
       if(asetniop.chord != 0) {
-        
+
+        // PRINT CHAR
         if(numHighBits(asetniop.chord) <= 2)
         {
           Serial.print("Lett:  ");
           Serial.print(getData(asetniop.chord).lett.base);
         }
+        // ELSE PRINT WORD
         else
         {
           Serial.print("Chord: ");
           putChord(asetniop, getData(asetniop.chord));
+          
+          Serial.print("\nBias: ");
+          Serial.print(asetniop.bias);
         }
         asetniop.chord = 0;
+        // TODO: Determine if necessary.
+        asetniop.bias = '\0';
         Serial.println();
       }
+
+      
       // PRINT SPACE
       if(asetniop.isWord)
       {
@@ -89,17 +100,20 @@ void loop()
       }
       Serial.println();
     }
-    // TODO: Set state of bias if current chord 
-    else if (/* CODE 
+    
+    // Set bias of keyboard to l or r based on value of aset.chord if a new chord has been started
+    else if (last_asetniop.chord == 0 && asetniop.chord != 0)
+    {
+      asetniop.bias = asetniop.chord >= 0x10 ? 'r' : 'l';
+    }
 
-    
-    
     //TODO: If chord shape is backspace, set flag and start key event.
 
     //TODO: If chord shape is no longer backspace or 1 of the keys was released, end key event.
+    
     last_asetniop = asetniop;
   }
-  // TODO: ?Possibly synchronize the output of the keyboard timewise with some sort of delta t. 
+  // TODO?: Possibly synchronize the output of the keyboard timewise with some sort of delta t. 
   delay(50);
 }
 
@@ -119,6 +133,19 @@ uint8_t numHighBits(uint8_t num)
   int toReturn = 0;
   for(int i = 0; i < 8; i++)  if(num & (1 << i))  toReturn++;
   return toReturn;
+}
+
+/* Bias meaning:
+ * 
+ * 0000 0000
+ * 0123 4567 -1
+ */
+char firstHighBit(uint8_t num)
+{
+  // Magic, magic single-line for and if statements
+  for(int i = 0; i < 8; i++)  if (num & (1 << i))  return i;
+  // No bit found, inform caller
+  return -1;
 }
 
 
