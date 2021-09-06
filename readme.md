@@ -32,7 +32,7 @@ Later down the line, I intend to create a more fleshed out prototype. The suppli
 ## Initial complications: 
 The ASETNIOP layout is fairly consistent in its function, but there are some discrepencies that need to be accounted for. They're listed in the order I intend to (or have) completed them.
 
-1. Initally, I had a hard time finding a reference for the chordmapping on the keyboard, especially one that I could easily convert into a format C could understand. I ended up using the JSON file from the asetniop creator's website, https://asetniop.com.
+1. Initally, I had a hard time finding a reference for the chordmapping on the keyboard, especially one that I could easily convert into a format C could understand. I ended up using the JSON file from the asetniop creator's website, https://asetniop.com, and then creating a python file to transfer the data into a .ino file that Arduino's IDE can understand.
 
 2. The ATMEGA 328p only has 2kb of SRAM, which is pretty much the equivallent of program space in atmel's SOC processors. Considering my lookup table would at minimum take up nearly 6-9kB, this wasn't going to work. To solve this, I instead kept the constant struct array in the onboard flash storage using PROGMEM, and used memcpy_p() from <pgmspace.h> to fetch data as needed. 
 
@@ -44,7 +44,7 @@ The ASETNIOP layout is fairly consistent in its function, but there are some dis
 
     The specific order follows a distinct pattern, shared across all 4 primaries:
     - For a partial: primary, opposing partial, congruent word, opposing partial
-    - For a word: same side word, opposing word, congruent partial, opposing partial
+    - For a word: primary, opposing word, congruent partial, opposing partial
 
     With a bit of luck, I was able to discover that this behavior exhibited by the order of chord priority is very similar to a binary counter. If you assign each partial and word a number from 0 to 4 in binary (lp:00, rp:01, lw:10, rw:11) and xor this with indices from a for loop, you will then get the next chord in the sequence. For instance, the right partial's order would be: 01, 00, 11, 10:
     * 1 ^ 0 = 0b01
