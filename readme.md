@@ -20,7 +20,7 @@ Once the keyboard is configured, I can go about adding some more functionality. 
 
 ## Necessary Equipment
 Later down the line, I intend to create a more fleshed out prototype. The supplies required for this project as of late are:
-* Keyboard switches - 10
+* Keyboard switches - 10, 12?
 * keyboard caps - 10, 12?
 * ATMEGA32U4 Dev Board (Testing commenced with 328p (Ardu. Uno), lacked usb peripheral mode)
 * Soldering iron, flux, solder (owned)
