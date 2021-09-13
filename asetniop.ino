@@ -15,8 +15,9 @@ const key keys[NUM_KEYS] = {
   {'n', 9}, {'i', 10}, {'o', 11}, {'p', 12}
 };
 
-const uint8_t space_pin = 6; 
-const uint8_t shift_pin = 8;
+const uint8_t shift_pin = 6;
+const uint8_t space_pin = 8; 
+
 
 // Store state of keyboard. Names self-explanatory.
 keyboard_obj asetniop;
@@ -63,7 +64,6 @@ void loop()
     asetniop.isWord |= asetniop.spaceDown;
 
 
-    
     // If no keys currently pressed
     if(!keyHeld(asetniop))
     { 

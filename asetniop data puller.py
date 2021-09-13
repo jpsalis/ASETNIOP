@@ -3,45 +3,65 @@ import sys
 
 DEF = ""
 lookup = [('base', 'base'), ('baseshift', 'baseshift'),('lp', 'tlp'), ('rp', 'trp'), ('lw', 'tlw'), ('rw', 'trw')]
+text = {
+    "header" : "const chordShape chordLookup[TABLESIZE] PROGMEM = {",
+    "footer" : "};"
+}
 
 
 # FINAL GOAL: Array of 255 elements, each storing data about that keypress.
 # IMPORTANT: B/C 0b0000.0000 serves no purpose, the array can be shifted 1 element, so 0000.0000 becomes 0000.0001, so on.
 def main():
     with open('asetniop.txt') as f:
-        data = f.read()
-
-    data = json.loads(data)
-
-    output = []
-    max_len = {}
+        data = json.loads(f.read())
+    print(text["header"])
+    temp = {}
+    #max_len = {}
+    
     for key in data:
-        index = int(key)
-        if index == 0:
-            continue
+        key = int(key)
 
-        # Insert a new row for new data to be entered.
-        output.insert(index - 1, {})
+        # skips initial item
+        if key == 0:
+            continue
+        
+        # print comma to the line if and only if you've passed the first loop
+        if key > 1:
+            print(",")
+        
+        # prepare dict for new input
+        temp.clear()
 
         # Loop through selections in lookup match table. Append to output if it's in the original table
         for pair in lookup:
-            if pair[1] in data[key].keys():
-                word = data[key].get(pair[1])[0]
+            if pair[1] in data[str(key)].keys():
+                word = data[str(key)].get(pair[1])[0]
                 
-                output[index - 1][pair[0]] = word
-                
-                # Find longest of each lookup pair, set length if longer or doesn't exist yet.
-                if pair[0] not in max_len or max_len[pair[0]] < len(word):
-                    max_len[pair[0]] = len(word)
+                temp[pair[0]] = word
 
-                
-                        
-        print(f"{index:08b}: {output[index-1]}")
+        # print(f"{key:08b}: ", end="") DEBUG: Prints binary equivallent
 
-    print(max_len)
+        # Check which version of the text to print, print appropriately
+        if ('base' in temp and 'baseshift' in temp):
+            print("{{'" + 
+                temp.get('base') + "', '" + 
+                temp.get('baseshift') + 
+                "'}}",
+            end = ""
+            )
+
+        else:
+            print('{.dict = {"' + 
+                temp.get('lp', '') + '", "' + 
+                temp.get('rp', '') + '", "' +
+                temp.get('lw', '') + '", "' +
+                temp.get('rw', "") + 
+                '"}}', 
+            end = ""
+            )
+
+    print(f'\n{text["footer"]}')
     return 0
         
-
-
 if __name__ == "__main__":
     main()
