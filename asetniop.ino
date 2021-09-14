@@ -70,35 +70,35 @@ void loop()
       // PRINT CHORD:      
       if(asetniop.chord != 0) {
 
-        // PRINT CHAR
-        if(numHighBits(asetniop.chord) <= 2)
+        // DETERMINE MODE
+        switch(asetniop.chord)
         {
-          Serial.print("Lett:  ");
-          Serial.print(getData(asetniop.chord).lett.base);
+          case BACKSPACE:
+            Serial.print("__BACKSPACE__");
+            break;
+          case NUMTOGGLE:
+            Serial.print("__TOGGLE__");
+            break;
+          case ENTER:         
+            Serial.println();
+            break;
+          default:
+            if(numHighBits(asetniop.chord) <= 2)  Serial.print(getData(asetniop.chord).lett.base); // Letter
+            else                                  putChord(asetniop, getData(asetniop.chord));     // Word
         }
-        // ELSE PRINT WORD
-        else
-        {
-          Serial.print("Chord: ");
-          putChord(asetniop, getData(asetniop.chord));
-          
-          Serial.print("\nBias: ");
-          Serial.print(asetniop.bias);
-        }
+
         asetniop.chord = 0;
         // TODO: Determine if necessary.
         asetniop.bias = '\0';
-        Serial.println();
       }
 
       
       // PRINT SPACE
       if(asetniop.isWord)
       {
-        Serial.println("space down");
+        Serial.print(" ");
         asetniop.isWord = false;
       }
-      Serial.println();
     }
     
     // Set bias of keyboard to l or r based on value of aset.chord if a new chord has been started
@@ -127,7 +127,9 @@ bool keyHeld (keyboard_obj a)                     {  return a.spaceDown || a.key
 
 
 
-// Counts number of flipped bits in number and returns to user. there's probably a more efficient way to do this i'm sure, just not sure offhand.
+/*
+ * Given an 8 bit number, returns the number of high bits.
+ */
 uint8_t numHighBits(uint8_t num)
 {
   int toReturn = 0;
@@ -135,10 +137,13 @@ uint8_t numHighBits(uint8_t num)
   return toReturn;
 }
 
-/* Bias meaning:
+
+/* 
+ * Returns the position of the first bit it finds in the byte.
  * 
- * 0000 0000
- * 0123 4567 -1
+ * RETURN VALUE:
+ * 0000 0000 
+ * 0123 4567 -1(Error)
  */
 char firstHighBit(uint8_t num)
 {
@@ -149,22 +154,18 @@ char firstHighBit(uint8_t num)
 }
 
 
-
 // Given an index, return a string that will be printed to the user. May need to add additional functionality later on.
-
 /*
  * PARAMS:
  *   - keyData: State of keyboard.
  *   - chordData: copy of a chord from lookup table
  *   
- * FUNCTION: Display relavant   
+ * FUNCTION: Display relavant chord or partial in a specific order if the primary doesn't exist.  
  * 0b00: lp
  * 0b01: rp
  * 0b10: lw
  * 0b11: rw
  */
-
-
 bool putChord(const keyboard_obj keyData, const chordShape chordData) {
   uint8_t primary = 0;
   primary |= (keyData.bias == 'r');
