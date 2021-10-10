@@ -11,12 +11,12 @@
 // PINS
 // TODO: may not need the character name in the struct for future reference.
 const key keys[NUM_KEYS] = {
-  {'a', 2}, {'s', 3}, {'e', 4}, {'t', 5}, 
-  {'n', 9}, {'i', 10}, {'o', 11}, {'p', 12}
+  {'a', 5}, {'s', 7}, {'e', 9}, {'t', 10}, 
+  {'n', A0}, {'i', A1}, {'o', A2}, {'p', A3}
 };
 
-const uint8_t shift_pin = 6;
-const uint8_t space_pin = 8; 
+const uint8_t shift_pin = 11;
+const uint8_t space_pin = 12; 
 
 
 // Store state of keyboard. Names self-explanatory.
@@ -92,7 +92,6 @@ void loop()
         asetniop.bias = '\0';
       }
 
-      
       // PRINT SPACE
       if(asetniop.isWord)
       {
@@ -108,6 +107,7 @@ void loop()
     }
 
     //TODO: If chord shape is backspace, set flag and start key event.
+    
 
     //TODO: If chord shape is no longer backspace or 1 of the keys was released, end key event.
     
@@ -122,8 +122,8 @@ void loop()
 //FUNCTIONS:
 
 // Check if any key differences observed.
-bool keyDiff (keyboard_obj cur, keyboard_obj last){  return (cur.keymap != last.keymap || cur.spaceDown != last.spaceDown);  }
-bool keyHeld (keyboard_obj a)                     {  return a.spaceDown || a.keymap;  }
+bool keyDiff (keyboard_obj cur, keyboard_obj last)  {  return (cur.keymap != last.keymap || cur.spaceDown != last.spaceDown);  }
+bool keyHeld (keyboard_obj a)  {  return a.spaceDown || a.keymap;  }
 
 
 
@@ -154,7 +154,6 @@ char firstHighBit(uint8_t num)
 }
 
 
-// Given an index, return a string that will be printed to the user. May need to add additional functionality later on.
 /*
  * PARAMS:
  *   - keyData: State of keyboard.
