@@ -1,6 +1,9 @@
 #include "lookup.h"
 #include <ctype.h>
-
+#define KEYBOARD
+#ifdef KEYBOARD
+  #include <Keyboard.h>
+#endif
 /*   
  *  Layout:
  *   _____   _____
@@ -25,8 +28,14 @@ keyboard_obj last_asetniop;
 
 void setup()
 {
-  Serial.begin(9600);
   
+  // Temporary test
+  delay(1000);
+  digitalWrite(13, HIGH);
+  #ifdef KEYBOARD
+  Keyboard.begin(); 
+  #endif
+  Serial.begin(9600);
   last_asetniop.chord = asetniop.chord = 0;
   last_asetniop.keymap = asetniop.keymap = 0;
 
@@ -74,17 +83,29 @@ void loop()
         switch(asetniop.chord)
         {
           case BACKSPACE:
-            Serial.print("__BACKSPACE__");
+            #ifdef KEYBOARD
+              Keyboard.write(KEY_BACKSPACE);
+            #else
+              Serial.print("__BACKSPACE__");
+            #endif
             break;
           case NUMTOGGLE:
             Serial.print("__TOGGLE__");
             break;
           case ENTER:         
-            Serial.println();
+            #ifdef KEYBOARD
+              Keyboard.write(KEY_RETURN);
+            #else
+              Serial.print("__BACKSPACE__");
+            #endif
             break;
           default:
-            if(numHighBits(asetniop.chord) <= 2)  Serial.print(getData(asetniop.chord).lett.base); // Letter
-            else                                  putChord(asetniop, getData(asetniop.chord));     // Word
+            #ifdef KEYBOARD
+              if(numHighBits(asetniop.chord) <= 2)  Keyboard.print(getData(false, asetniop.chord).lett.base); // Letter
+              #else
+              if(numHighBits(asetniop.chord) <= 2)  Serial.print(getData(false, asetniop.chord).lett.base); // Letter
+            #endif
+            else                                  putChord(asetniop, getData(false, asetniop.chord));     // Word
         }
 
         asetniop.chord = 0;
@@ -95,7 +116,11 @@ void loop()
       // PRINT SPACE
       if(asetniop.isWord)
       {
-        Serial.print(" ");
+        #ifdef KEYBOARD
+              Keyboard.write(' ');
+        #else
+              Serial.print(" ");
+        #endif
         asetniop.isWord = false;
       }
     }
@@ -196,7 +221,11 @@ bool putChord(const keyboard_obj keyData, const chordShape chordData) {
     // Verify value
     if (output != "") 
     {
-      Serial.print(output);
+      #ifdef KEYBOARD
+        Keyboard.print(output);
+      #else
+        Serial.print(output);
+      #endif
       return true;
     }
   }

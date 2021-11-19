@@ -77,7 +77,12 @@ union chordShape{
   }dict;
 };
 
-chordShape getData(uint8_t shape);
+struct numShape{
+  char index;
+  chordShape c;
+};
+
+chordShape getData(bool isNumMode, uint8_t shape);
 
 const chordShape chordLookup[TABLESIZE] PROGMEM = {
 {{'a', 'A'}},
