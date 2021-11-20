@@ -56,4 +56,4 @@ The ASETNIOP layout is fairly consistent in its function, but there are some dis
 
 5. UNIMPLEMENTED: Backspace doesn't work like a normal chord. It's activated by holding the 't' and 'p' keys at the same time. As long as you're holding both keys, it will hold the keypress so the OS can use repeat mode as necessary. Because the key is normally not pressed until all keys are released, I can't see any way to implement it except to make the repeat a feature of the keyboard itself.
 
-6. UNRESOLVED: The ATMEGA 328P does not support USB peripheral mode, once I get out of the initial testing phase with serial port I have to port to some other processor that does, so my keyboard can natively be supported no matter what device I plug it into. I am considering the ATmega32u4.
+6. RESOLVED: The ATMEGA 328P does not support USB peripheral mode, once I get out of the initial testing phase with serial port I have to port to some other processor that does, so my keyboard can natively be supported no matter what device I plug it into. I am considering the ATmega32u4.
