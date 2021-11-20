@@ -28,18 +28,18 @@ keyboard_obj last_asetniop;
 
 void setup()
 {
-  
-  // Temporary test
-  delay(1000);
-  digitalWrite(13, HIGH);
+ // Temporary test
+  //delay(1000);
+  //Serial.begin(9600);
   #ifdef KEYBOARD
   Keyboard.begin(); 
   #endif
-  Serial.begin(9600);
+  
   last_asetniop.chord = asetniop.chord = 0;
   last_asetniop.keymap = asetniop.keymap = 0;
 
   // DECLARING PINMODES:
+  pinMode(LED_BUILTIN, OUTPUT);
   pinMode(shift_pin, INPUT);
   pinMode(space_pin, INPUT);
   
@@ -49,6 +49,7 @@ void setup()
     // TODO: Possibly make this a function since this line is repeated later.
     asetniop.keymap |= digitalRead(keys[i].pin) << i;
   }
+  digitalWrite(LED_BUILTIN, HIGH);
 }
 
 
@@ -63,7 +64,7 @@ void loop()
   }
   
   asetniop.spaceDown = digitalRead(space_pin);
-  
+  asetniop.shiftDown = digitalRead(shift_pin);
 
   // DETECT KEYCHANGES
   if(keyDiff(asetniop, last_asetniop))
@@ -82,30 +83,54 @@ void loop()
         // DETERMINE MODE
         switch(asetniop.chord)
         {
+          case ENTER:         
+            #ifdef KEYBOARD
+              Keyboard.write(KEY_RETURN);
+            #else
+              Serial.print("__ENTER__");
+            #endif
+          break;
+            
           case BACKSPACE:
             #ifdef KEYBOARD
               Keyboard.write(KEY_BACKSPACE);
             #else
               Serial.print("__BACKSPACE__");
             #endif
-            break;
-          case NUMTOGGLE:
-            Serial.print("__TOGGLE__");
-            break;
-          case ENTER:         
+          break;
+
+          case TAB:
             #ifdef KEYBOARD
-              Keyboard.write(KEY_RETURN);
+              Keyboard.write(KEY_TAB);
             #else
-              Serial.print("__BACKSPACE__");
+              Serial.print("__TAB__");
             #endif
-            break;
+          break;
+            
+          case NUMTOGGLE:
+            /* TODO */
+            asetniop.numMode = !asetniop.numMode;
+            Serial.print("__TOGGLE__");
+          break;
+            
+          
+            
           default:
-            #ifdef KEYBOARD
-              if(numHighBits(asetniop.chord) <= 2)  Keyboard.print(getData(false, asetniop.chord).lett.base); // Letter
+            // Letter
+            if(numHighBits(asetniop.chord) <= 2 || asetniop.numMode)
+            {  
+              
+              #ifdef KEYBOARD
+                Keyboard.write(getData(asetniop.numMode, asetniop.chord).lett.base);
               #else
-              if(numHighBits(asetniop.chord) <= 2)  Serial.print(getData(false, asetniop.chord).lett.base); // Letter
-            #endif
-            else                                  putChord(asetniop, getData(false, asetniop.chord));     // Word
+                Serial.print(  getData(asetniop.numMode, asetniop.chord).lett.base);
+              #endif
+            }
+            else
+            {
+              // Word
+              putChord(asetniop, getData(false, asetniop.chord));
+            } 
         }
 
         asetniop.chord = 0;
