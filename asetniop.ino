@@ -1,8 +1,16 @@
 #include "lookup.h"
 #include <ctype.h>
+
 #define KEYBOARD
+
+// Creating these macros for testing purposes. May remove them at a later date.
 #ifdef KEYBOARD
-#include <Keyboard.h>
+  #include <Keyboard.h>
+  #define writeChord(val) Keyboard.write(val)
+  #define printChord(val) Keyboard.print(val)
+#else
+  #define writeChord(val) Serial.print(val)
+  #define printChord(val) Serial.println(val)
 #endif
 /*
     Layout:
@@ -29,9 +37,10 @@ keyboard_obj last_asetniop;
 void setup()
 {
 #ifdef KEYBOARD
+  Serial.begin(9600);
   Keyboard.begin();
 #else
-  //Serial.begin(9600);
+  
 #endif
 
   last_asetniop.chord = asetniop.chord = 0;
@@ -85,43 +94,27 @@ void loop()
         switch (asetniop.chord)
         {
           case ENTER:
-#ifdef KEYBOARD
-            Keyboard.write(KEY_RETURN);
-#else
-            Serial.print("__ENTER__");
-#endif
+            writeChord(KEY_RETURN);
             break;
 
           case BACKSPACE:
-#ifdef KEYBOARD
-            Keyboard.write(KEY_BACKSPACE);
-#else
-            Serial.print("__BACKSPACE__");
-#endif
+            writeChord(KEY_BACKSPACE);
             break;
 
           case TAB:
-#ifdef KEYBOARD
-            Keyboard.write(KEY_TAB);
-#else
-            Serial.print("__TAB__");
-#endif
+            writeChord(KEY_TAB);
             break;
 
           case NUMTOGGLE:
             asetniop.numMode = !asetniop.numMode;
-            Serial.print("__TOGGLE__");
             break;
 
-
-          // Chord must be a normal character
           default:
-            //WIP
             // Letter
             putChord(asetniop, getData(asetniop.numMode, asetniop.chord));
         }
 
-
+        // DEBUG
         Serial.println("Shift Change");
         asetniop.shiftState = (asetniop.shiftState % 0b10 == 1 ? UPPER_CYCLE : LOWER);
         Serial.println(asetniop.shiftState);
@@ -134,11 +127,7 @@ void loop()
       // PRINT SPACE
       if (asetniop.isWord)
       {
-#ifdef KEYBOARD
-        Keyboard.write(' ');
-#else
-        Serial.print(" ");
-#endif
+        writeChord(' ');
         asetniop.isWord = false;
       }
     }
@@ -154,8 +143,9 @@ void loop()
 
     //TODO: If chord shape is no longer backspace or 1 of the keys was released, end key event.
 
-    // Could cause an issue, might want to have this set more statically in the future, and assign it separately from the main key checker
-    // Increment shift state if shift key changed
+
+    // TODO: Adding on every change instead of relying on the actual state could cause an issue,
+    // might want to have this set more statically in the future, and assign it separately from the main key checker
     if (asetniop.shiftDown != last_asetniop.shiftDown)
     {
       asetniop.shiftState = (asetniop.shiftState + 1) % 4;
@@ -178,13 +168,13 @@ void loop()
 bool keyDiff (keyboard_obj cur, keyboard_obj last)
 {
   return (cur.keymap != last.keymap ||
-          cur.spaceDown != last.spaceDown);
+          cur.spaceDown != last.spaceDown ||
+          cur.shiftDown != last.shiftDown);
 }
+
 bool keyHeld (keyboard_obj a)  {
   return a.spaceDown || a.keymap;
 }
-
-
 
 uint8_t numHighBits(uint8_t num)
 {
@@ -223,29 +213,24 @@ char firstHighBit(uint8_t num)
 */
 bool putChord(const keyboard_obj keyData, const chordShape chordData) {
   
-  // Determine if chord is a number, character, or word and treat accordingly.
+  // IF CHORD IS CHAR
   if (numHighBits(keyData.chord) <= 2 || keyData.numMode)
   {
     char temp = getData(asetniop.numMode, asetniop.chord).lett.base;
-    if keyData.
-#ifdef KEYBOARD
-    Keyboard.write(temp);
-#else
-    Serial.print(temp);
-#endif
+    if (keyData.shiftState != LOWER)    temp = toupper(temp);
+    
+    writeChord(temp);
     return true;
   }
 
-  // Otherwise the chordData refers to a word
-
-  // Setting initial condition of chord
+  // ELSE PRINT THE WORD WITH MAGIC
   uint8_t primary = 0;
   primary |= (keyData.bias == 'r');
   primary |= keyData.isWord << 1;
 
   /* this is some clever bit of math I'm pretty proud of.
      xor'ing the primary state with the digits 0-4 gives me the priority order I want for every possible primary.
-     Imagine primary is 01, or RP. Order for others if no primary exists there should then go:
+     Imagine primary is 0b01, or RP. Order for others if no primary exists there should then go:
      RP (01), LP (00), RW (10)then LW (11). This behavior allows this design to function as intended.
   */
   String output;
@@ -269,11 +254,8 @@ bool putChord(const keyboard_obj keyData, const chordShape chordData) {
     // Verify value
     if (output != "")
     {
-#ifdef KEYBOARD
-      Keyboard.print(output);
-#else
-      Serial.print(output);
-#endif
+      // TODO: Convert word based on shift state. 
+      printChord(output);
       return true;
     }
   }
