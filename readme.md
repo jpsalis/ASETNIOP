@@ -22,14 +22,13 @@ Once the keyboard is configured, I can go about adding some more functionality. 
 Later down the line, I intend to create a more fleshed out prototype. The supplies required for this project as of late are:
 * Keyboard switches - 10, 12?
 * keyboard caps - 10, 12?
-* ATMEGA32U4 Dev Board (Testing commenced with 328p (Ardu. Uno), lacked usb peripheral mode)
-* Soldering iron, flux, solder (owned)
+* Soldering iron, flux, solder
 * Hot Air Rework Station? (If I decide to go beyond a dev board for the processor)
 
 
 
 
-## Initial complications: 
+## Project Complications (Ordered by resolve order/ To resolve next order)
 The ASETNIOP layout is fairly consistent in its function, but there are some discrepencies that need to be accounted for. They're listed in the order I intend to (or have) completed them.
 
 1. Initally, I had a hard time finding a reference for the chordmapping on the keyboard, especially one that I could easily convert into a format C could understand. I ended up using the JSON file from the asetniop creator's website, https://asetniop.com, and then creating a python file to transfer the data into a .ino file that Arduino's IDE can understand.
@@ -46,14 +45,17 @@ The ASETNIOP layout is fairly consistent in its function, but there are some dis
     - For a partial: primary, opposing partial, congruent word, opposing partial
     - For a word: primary, opposing word, congruent partial, opposing partial
 
-    With a bit of luck, I was able to discover that this behavior exhibited by the order of chord priority is very similar to a binary counter. If you assign each partial and word a number from 0 to 4 in binary (lp:00, rp:01, lw:10, rw:11) and xor this with indices from a for loop, you will then get the next chord in the sequence. For instance, the right partial's order would be: 01, 00, 11, 10:
+    With a bit of luck, I was able to discover that this behavior exhibited by the order of chord priority is basically just a binary counter with extra steps. If you assign each partial and word a number from 0 to 4 in binary (lp:00, rp:01, lw:10, rw:11) and xor this with indices from a for loop, you will then get the next chord in the sequence. For instance, the right partial's order would be: 01, 00, 11, 10:
     * 1 ^ 0 = 0b01
     * 1 ^ 1 = 0b00
     * 1 ^ 2 = 0b11
     * 1 ^ 3 = 0b10
 
-4. UNIMPLEMENTED: The shift key with this layout poses a particular problem. It cycles through many modes, and creating a compact transition between them is especially challenging. However, same as above I am able to assign each mode a numeric value and with a bit of work, diagram and setup a control flow for using a switch statement.
+4. The ATMEGA 328P does not support USB peripheral mode, so development was switched to the ATMEGA32u4, due to its onboard support for USB Peripheral. The exact breakout board in use is the Itsy Bitsy 32U4 by Adafruit.
 
-5. UNIMPLEMENTED: Backspace doesn't work like a normal chord. It's activated by holding the 't' and 'p' keys at the same time. As long as you're holding both keys, it will hold the keypress so the OS can use repeat mode as necessary. Because the key is normally not pressed until all keys are released, I can't see any way to implement it except to make the repeat a feature of the keyboard itself.
+5. HALF-IMPLEMENTED: The shift key with this layout posed a particular problem. It cycles through many modes, and creating a compact transition did take me a bit to figure out after staring at a paper for a while. Same as above I am able to assign each mode a numeric value. What stumped me for a while was how to tell the computer that
 
-6. RESOLVED: The ATMEGA 328P does not support USB peripheral mode, once I get out of the initial testing phase with serial port I have to port to some other processor that does, so my keyboard can natively be supported no matter what device I plug it into. I am considering the ATmega32u4.
+6. UNIMPLEMENTED: Backspace doesn't work like a normal chord. It's activated by holding the 't' and 'p' keys at the same time. As long as you're holding both keys, it will hold the keypress so the OS can use repeat mode as necessary. Because the key is normally not pressed until all keys are released, I can't see any way to implement it except to make the repeat a feature of the keyboard itself.
+
+7. UNIMPLEMENTED: The final project (If I have time) Should be a split keyboard, with a headphone jack transmitting I2C between the boards. I may do this after submission, because although the concept is simple, it's a new way of programming to me, designing a subhost and subperipheral for a peripheral. It's odd to think about.
+
