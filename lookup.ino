@@ -2,7 +2,7 @@
 
 // TODO: If chord mode is numberpad, return 
 chordShape getData(bool isNumMode, uint8_t shapeID) {
-  chordShape *tempref;
+  const chordShape *tempref;
   chordShape temp;
 
   // Pick table based on number mode selected

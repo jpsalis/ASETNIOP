@@ -148,7 +148,7 @@ void loop()
     // might want to have this set more statically in the future, and assign it separately from the main key checker
     if (asetniop.shiftDown != last_asetniop.shiftDown)
     {
-      asetniop.shiftState = (asetniop.shiftState + 1) % 4;
+      asetniop.shiftState = (ShiftModes)(((uint8_t)asetniop.shiftState + 1) % 4);
       Serial.println(asetniop.shiftState);
     }
 
@@ -254,6 +254,21 @@ bool putChord(const keyboard_obj keyData, const chordShape chordData) {
     // Verify value
     if (output != "")
     {
+      switch (keyData.shiftState)
+      {
+        case LOWER:
+          break;
+
+        case CAMEL:
+          output[0] = toupper(output[0]);
+          break;
+
+        // Every other case is uppercase in one form or another
+        default:
+          for(int i = 0; i < output.length(); i++) 
+            output[i] = toupper(output[i]);
+          break;
+      }
       // TODO: Convert word based on shift state. 
       printChord(output);
       return true;
