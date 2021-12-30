@@ -29,6 +29,14 @@ enum ShiftModes { LOWER, UPPER, CAMEL, UPPER_CYCLE };
 // PARTIAL TYPES
 enum partialModes { LP, RP, LW, RW };
 
+
+// BACKSPACE MODES {TODO}
+/* BACK_INACTIVE: Backspace not being pressed.
+ * BACK_WAIT: Backspace held, inside delay before BACK_HOLD. If released in this mode, presses backspace.
+ * BACK_HOLD: Backspace held, delay is up, holding key
+ */
+enum backspaceModes {BACK_INACTIVE, BACK_WAIT, BACK_PRESS, BACK_HOLD};
+
 // May be removed later, as character name may not be necessary and redundant b/c of lookup table.
 struct key {
   char name;
@@ -47,6 +55,7 @@ struct keyboard_obj{
   
   //char  backState;
   ShiftModes shiftState : 2;
+  uint8_t    backState  : 2;
   char    bias; // Will be 'l' or 'r' depending on which side of the keyboard began the chord. The bias helps determine which chord from the lookup is active.
   //TODO: Add methods to struct so user can interact with shift state in meaningful way. Methods like, isLower, isCamel, isUpper
 };
