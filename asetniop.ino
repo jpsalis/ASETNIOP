@@ -51,7 +51,12 @@ void setup()
     asetniop.keymap |= digitalRead(keys[i].pin) << i;
   }
 
-  digitalWrite(LED_BUILTIN, HIGH);
+  // FLASH LED WHEN FINISHED SETTING UP
+  for (int i = 0; i < 6; i++)
+  {
+    digitalWrite(LED_BUILTIN, (i % 2 == 0) ? HIGH : LOW);
+    delay(40);
+  }
 }
 
 
@@ -92,7 +97,8 @@ void loop()
             break;
 
           case BACKSPACE:
-            //Keyboard.write(KEY_BACKSPACE);
+            // Code used to print here, now printed with different code. Case remains because the computer 
+            // will still try to treat it like a normal chord through "default:" even if it's a special case.
             break;
 
           case TAB:
@@ -101,6 +107,7 @@ void loop()
 
           case NUMTOGGLE:
             asetniop.numMode = !asetniop.numMode;
+            digitalWrite(LED_BUILTIN, (asetniop.numMode) ? HIGH : LOW);
             break;
 
           default:
@@ -108,13 +115,11 @@ void loop()
             putChord(asetniop, getData(asetniop.numMode, asetniop.chord));
         }
 
+        // If shiftstate is UPPER or UPPER_CYCLE, change into UPPER_CYCLE.
+        // Else, turn shiftstate to LOWER.
         asetniop.shiftState = (asetniop.shiftState % 0b10 == 1 ? UPPER_CYCLE : LOWER);
 
-        Serial.print("Shift Change to ");
-        Serial.println(asetniop.shiftState);
-
         asetniop.chord = 0;
-        // TODO: Determine if necessary.
         asetniop.bias = '\0';
       }
 
@@ -154,7 +159,6 @@ void loop()
     if (asetniop.shiftDown != last_asetniop.shiftDown)
     {
       asetniop.shiftState = (ShiftModes)(((uint8_t)asetniop.shiftState + 1) % 4);
-      Serial.println(asetniop.shiftState);
     }
 
     last_asetniop = asetniop;
