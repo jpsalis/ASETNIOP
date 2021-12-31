@@ -2,15 +2,20 @@
 #include <ctype.h>
 #include <Keyboard.h>
 
-/*
-    Layout:
-     _____   _____
-    |aset | | niop|
-    \___sp| |sh___/
-*/
+/*  Layout:  
+ *       ◻
+ *       |
+ *    ___|_     _____
+ *   |aset |===| niop|
+ *   \___sp|   |sh___/
+ *
+ * Left half will be host, connected to PC,
+ * Right half will be the peripheral, providing keyData to left half.
+ * Connection will be I^2C.
+  */
 
 // PINS
-// TODO: may not need the character name in the struct for future reference.
+// Character name is just for reference against diagram above.
 const key keys[NUM_KEYS] = {
   {'a', 5}, {'s', 7}, {'e', 9}, {'t', 10},
   {'n', A0}, {'i', A1}, {'o', A2}, {'p', A3}
@@ -87,7 +92,7 @@ void loop()
             break;
 
           case BACKSPACE:
-            Keyboard.write(KEY_BACKSPACE);
+            //Keyboard.write(KEY_BACKSPACE);
             break;
 
           case TAB:
@@ -128,14 +133,24 @@ void loop()
     }
 
     //TODO: If chord shape is backspace, set flag and start key event.
-    
-
-    //TODO: If chord shape is no longer backspace or 1 of the keys was released, end key event.
 
 
-    // TODO: Adding on every change instead of relying on the actual state could cause an issue,
-    // might want to have this set more statically in the future, and assign it separately from the main key checker
+    // POSSIBLE TODO:
+    if (asetniop.backState == BACK_INOP && (asetniop.chord == BACKSPACE && asetniop.keymap == BACKSPACE))
+    {
+      Keyboard.press(KEY_BACKSPACE);
+      // Hold key
+      // Todo: start timer, set mode to
+      asetniop.backState = BACK_HOLD;
+    }
+    else if (asetniop.backState == BACK_HOLD
+             && (asetniop.chord != BACKSPACE || asetniop.keymap != BACKSPACE))
+    {
+      Keyboard.release(KEY_BACKSPACE);
+      asetniop.backState = BACK_INOP;
+    }
 
+    // Though I can't imagine any fail condition, it's theoretically possible for shiftstate to desync from shiftDown.
     if (asetniop.shiftDown != last_asetniop.shiftDown)
     {
       asetniop.shiftState = (ShiftModes)(((uint8_t)asetniop.shiftState + 1) % 4);
@@ -207,7 +222,7 @@ bool putChord(const keyboard_obj keyData, const chordShape chordData) {
   if (numHighBits(keyData.chord) <= 2 || keyData.numMode)
   {
     char temp = getData(asetniop.numMode, asetniop.chord).lett.base;
-    
+
     if (keyData.shiftState != LOWER)    temp = toupper(temp);
 
     Keyboard.write(temp);
@@ -225,7 +240,7 @@ bool putChord(const keyboard_obj keyData, const chordShape chordData) {
   String output;
   for (uint8_t i = 0; i < 4; i++)
   {
-    switch (primary ^ i) 
+    switch (primary ^ i)
     {
       case LP:
         output = String(chordData.dict.lp);
@@ -240,32 +255,31 @@ bool putChord(const keyboard_obj keyData, const chordShape chordData) {
         output = String(chordData.dict.rw);
         break;
     }
+    // Check if current chord is valid
+    if (output != "")
+    {
+      // SET CASE
+      switch (keyData.shiftState)
+      {
+        case LOWER:
+          break;
+
+        case CAMEL:
+          output[0] = toupper(output[0]);
+          break;
+
+        // Every other case is UPPERCASE in one form or another
+        default:
+          for (int i = 0; i < output.length(); i++)
+            output[i] = toupper(output[i]);
+          break;
+      }
+
+      // PRINT RESULT
+      Keyboard.print(output);
+
+      return true;
+    }
   }
-
-  // ERROR CHECKING
-  if (output == "") return false;
-
-  // SET CASE
-  switch (keyData.shiftState)
-  {
-    case LOWER:
-      break;
-
-    case CAMEL:
-      output[0] = toupper(output[0]);
-      break;
-
-    // Every other case is UPPERCASE in one form or another
-    default:
-      for (int i = 0; i < output.length(); i++)
-        output[i] = toupper(output[i]);
-      break;
-  }
-
-  // PRINT RESULT
-  Keyboard.print(output);
-
-  return true;
-
-
+  return false;
 }

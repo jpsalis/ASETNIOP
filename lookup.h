@@ -17,31 +17,41 @@ enum specialChords {
   TAB = 0b00001111
 };
 
-// SHIFT MODES
-/*
-lower: Will type in all lowercase
-Camel: Capital first letter
-UPPER: Types in all caps.
-UPPER_CYCLE: Same as upper, but returns back to LOWER mode upon a key change instead of Camel
-*/
+/* SHIFT MODES
+ *  
+ * lower: Will type in all lowercase
+ * Camel: Capital first letter
+ * UPPER: Types in all caps.
+ * UPPER_CYCLE: Same as upper, but returns back to LOWER mode upon a key change instead of Camel
+ */
 enum ShiftModes { LOWER, UPPER, CAMEL, UPPER_CYCLE };
 
-// PARTIAL TYPES
+
+/* PARTIAL TYPES
+ *  
+ * LP: Left Partial
+ * RP: Right Partial
+ * LW: Left Word
+ * RW: Right Word
+ */
 enum partialModes { LP, RP, LW, RW };
 
 
-// BACKSPACE MODES {TODO}
-/* BACK_INACTIVE: Backspace not being pressed.
- * BACK_WAIT: Backspace held, inside delay before BACK_HOLD. If released in this mode, presses backspace.
- * BACK_HOLD: Backspace held, delay is up, holding key
+/* BACKSPACE MODES {PARTIAL TODO}
+ *  
+ *  BACK_INOP: Backspace not being pressed.
+ * BACK_WAIT: Backspace held, inside delay before BACK_HOLD. If released in this mode, presses backspace. {UNUSED RIGHT NOW}
+ * BACK_HOLD: Backspace held, delay is up, holding key.
  */
-enum backspaceModes {BACK_INACTIVE, BACK_WAIT, BACK_PRESS, BACK_HOLD};
+enum backModes { BACK_INOP, BACK_WAIT, BACK_HOLD };
 
-// May be removed later, as character name may not be necessary and redundant b/c of lookup table.
+
+// character name not necessary, just makes code easier to read.
 struct key {
   char name;
   uint8_t pin;
 };
+
 
 // TODO: Backspace mode. If active, won't attempt to check if backspace chord being held.
 // Will instead check for the chord to be released. Should also allow for the chord to be pressed again
@@ -55,7 +65,7 @@ struct keyboard_obj{
   
   //char  backState;
   ShiftModes shiftState : 2;
-  uint8_t    backState  : 2;
+  backModes  backState  : 2;
   char    bias; // Will be 'l' or 'r' depending on which side of the keyboard began the chord. The bias helps determine which chord from the lookup is active.
   //TODO: Add methods to struct so user can interact with shift state in meaningful way. Methods like, isLower, isCamel, isUpper
 };
@@ -71,8 +81,8 @@ union chordShape{
 
   // Word 
   // POTENTIAL TODO: Set as an array of string pointers.
-  // Would require some automation because I couldn't get
-  // PROGMEM to cooperate with references.
+  // Would require some automation or research because
+  // I couldn't get PROGMEM to cooperate with references.
   struct d{
     char lp[MAX_PART_LEN];
     char rp[MAX_PART_LEN];
