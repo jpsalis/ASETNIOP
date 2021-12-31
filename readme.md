@@ -1,11 +1,15 @@
 # ASETNIOP
-A keyboard concept and layout designed by Zach Dennis in 2012, based on the function and setup of the keyboard on his website, asetniop.com. Its goal is to simplify typing on tablets and similar mobile devices by assigning each letter of the alphabet to a chorded pattern on the layout, where each finger has 1, and only 1 key to press. 
+A keyboard concept and layout designed by Zach Dennis in 2012, based on the function and setup of the virtual keyboard on his website. Its goal is to simplify typing on tablets and similar mobile devices by assigning each letter of the alphabet to a chorded pattern on the layout, where each finger has 1, and only 1 key to press. It operates similarly to a steno keyboard for stenography.
 
-My design is a hardware-based implementation of the layout. Existing hardware based solutions have been created in the past by other individuals utilizing libraries and tools for keyboard making, but I wanted to challenge myself to create a similar design from scratch, while improving my proficiency at programming microcontrollers, and possibly refine certain details of the layout while i'm at it.
+My design is a hardware-based implementation of the layout. Existing hardware based solutions have been created in the past by other individuals utilizing libraries and tools for keyboard making, but I wanted to challenge myself to create a similar design from scratch, while improving my proficiency at programming microcontrollers, and possibly refine certain details of the layout while i'm at it. I was determined throughout the project to make it fit onto an ATMega 328p/32u4, I believe I have succeeded.
+
+
 
 ## Design Considerations
 1. Design must work as a standard HID peripheral with no additional drivers. In effect, it should be plug-and-play. This almost instantly excludes certain microcontrollers that don't come equipped with hardware USB peripheral abilities. Including my original prototype board, the atmega328p used in the Arduino Uno.
 2. Due to the nature of the keyboard layout, it will be ultimately setup as a split keyboard, connected by a sort of cable between the two modules. My intention is to use a headphone cable to transmit the I2C protocol, with the right keyboard sending telemetry data back to the left side upon request to be processed. {Unable due to time, may develop as personal project}
+3. Final design should be ergonomic and have optional risers of some kind, same as a normal keyboard.
+
 
 
 ## Potential Improvements:
@@ -27,6 +31,7 @@ The specific supplies required for this project as of late are:
 * Keyboard caps - 10, 12?
 * Soldering iron, flux, solder
 * A bunch of wires, resistors
+
 
 
 ## Project Complications (Ordered by resolve order/ To resolve next order)
