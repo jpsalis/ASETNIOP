@@ -37,7 +37,7 @@ The specific supplies required for this project as of late are:
 ## Project Complications (Ordered by resolve order/ To resolve next order)
 The ASETNIOP layout is fairly consistent in its function, but there are some discrepencies that need to be accounted for. They're listed in the order I intend to (or have) completed them.
 
-1. Initally, I had a hard time finding a reference for the chordmapping on the keyboard, especially one that I could easily convert into a format C could understand. I ended up using the JSON file from the asetniop creator's website, https://asetniop.com, and then creating a python file to transfer the data into a .ino file that Arduino's IDE can understand.
+1. Initally, I had a hard time finding a reference for the chordmapping on the keyboard, especially one that I could easily convert into a format C could understand. I ended up using the JSON file from the asetniop creator's [github page](https://github.com/asetniop/Predictive), then creating a python file to transfer the data into a .ino file that Arduino's IDE can understand.
 
 2. The ATMEGA 328p only has 2kb of SRAM, which is pretty much the equivallent of program space in atmel's SOC processors. Considering my lookup table would at minimum take up nearly 6-9kB, this wasn't going to work. To solve this, I instead kept the constant struct array in the onboard flash storage using PROGMEM, and used memcpy_p() from <pgmspace.h> to fetch data as needed. 
 
