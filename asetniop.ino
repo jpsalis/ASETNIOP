@@ -2,6 +2,8 @@
 #include <ctype.h>
 #include <Keyboard.h>
 
+// Sets up various serial features to demonstrate the function of the library
+#define DEMO
 /*  Layout:  
  *       ◻
  *       |
@@ -55,7 +57,7 @@ void setup()
   for (int i = 0; i < 6; i++)
   {
     digitalWrite(LED_BUILTIN, (i % 2 == 0) ? HIGH : LOW);
-    delay(40);
+    delay(30);
   }
 }
 
@@ -78,9 +80,18 @@ void loop()
   // DETECT KEYCHANGES:
   if (keyDiff(&asetniop, &last_asetniop))
   {
+    
+    
     // append any new keys to the chord.
     asetniop.chord |= asetniop.keymap;
     asetniop.isWord |= asetniop.spaceDown;
+
+    #ifdef DEMO
+      Serial.print("Chord: ");
+      Serial.print(asetniop.chord, BIN);
+      Serial.print("\t\tKeymap: ");
+      Serial.println(asetniop.keymap, BIN);
+    #endif
 
 
     // If no keys currently pressed
@@ -129,55 +140,56 @@ void loop()
         Keyboard.write(' ');
         asetniop.isWord = false;
       }
+
+      #ifdef DEMO
+        Serial.println("PRINT_EVENT");
+      #endif 
     }
 
-    // Set bias of keyboard to l or r based on value of aset.chord if a new chord has been started
+    // SET BIAS FOR NEW CHORD:
     else if (last_asetniop.chord == 0 && asetniop.chord != 0)
     {
       asetniop.bias = asetniop.chord >= 0x10 ? 'r' : 'l';
     }
 
-    //TODO: If chord shape is backspace, set flag and start key event.
-
-
-    // POSSIBLE TODO:
-    if (asetniop.backState == BACK_INOP && (asetniop.chord == BACKSPACE && asetniop.keymap == BACKSPACE))
+    // BACKSPACE HOLD:
+    if (asetniop.backState == BACK_INOP 
+        && (asetniop.chord == BACKSPACE && asetniop.keymap == BACKSPACE))
     {
       Keyboard.press(KEY_BACKSPACE);
-      // Hold key
-      // Todo: start timer, set mode to
       asetniop.backState = BACK_HOLD;
     }
-    else if (asetniop.backState == BACK_HOLD
+    
+    // BACKSPACE RELEASE:
+    else if (asetniop.backState == BACK_HOLD 
              && (asetniop.chord != BACKSPACE || asetniop.keymap != BACKSPACE))
     {
       Keyboard.release(KEY_BACKSPACE);
       asetniop.backState = BACK_INOP;
     }
-
-    // Though I can't imagine any fail condition, it's theoretically possible for shiftstate to desync from shiftDown.
-    if (asetniop.shiftDown != last_asetniop.shiftDown)
-    {
-      asetniop.shiftState = (ShiftModes)(((uint8_t)asetniop.shiftState + 1) % 4);
-    }
-
-    last_asetniop = asetniop;
+        
+  }
+  
+  // SET SHIFTSTATE
+  if (asetniop.shiftDown != last_asetniop.shiftDown)
+  {
+    asetniop.shiftState = (ShiftModes)(((uint8_t)asetniop.shiftState + 1) % 4);
   }
 
-  // TODO?: Possibly synchronize the output of the keyboard timewise with some sort of delta t.
-  delay(50);
+  // this operation is performed every tick which is unecessary but it reduces code repetition
+  last_asetniop = asetniop;
+  delay(10);
 }
 
 
 
-//FUNCTIONS:
+// HELPER FUNCTIONS:
 
 // Check if any key differences observed.
 bool keyDiff (const keyboard_obj *cur, const keyboard_obj *last)
 {
   return (cur->keymap != last->keymap
-          || cur->spaceDown != last->spaceDown
-          || cur->shiftDown != last->shiftDown);
+          || cur->spaceDown != last->spaceDown);
 }
 
 bool keyHeld (const keyboard_obj *a)
@@ -225,10 +237,16 @@ bool putChord(const keyboard_obj keyData, const chordShape chordData) {
   // PRINT IF CHARACTER
   if (numHighBits(keyData.chord) <= 2 || keyData.numMode)
   {
-    char temp = getData(asetniop.numMode, asetniop.chord).lett.base;
+    char temp;
 
-    if (keyData.shiftState != LOWER)    temp = toupper(temp);
-
+    if (keyData.shiftState == LOWER) 
+    {
+      temp = getData(asetniop.numMode, asetniop.chord).lett.base;
+    }
+    else
+    {
+      temp = getData(asetniop.numMode, asetniop.chord).lett.baseshift;
+    }
     Keyboard.write(temp);
     return true;
   }
