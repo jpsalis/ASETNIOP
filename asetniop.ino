@@ -1,9 +1,6 @@
  #include "lookup.h"
 #include <ctype.h>
 #include <Keyboard.h>
-
-// Sets up various serial features to demonstrate the function of the library
-#define DEMO
 /*  Layout:  
  *       ◻
  *       |
@@ -34,10 +31,6 @@ keyboard_obj last_asetniop;
 void setup()
 {
   Keyboard.begin();
-
-  #ifdef DEMO
-    Serial.begin(9600);
-  #endif
 
   last_asetniop.chord = asetniop.chord = 0;
   last_asetniop.keymap = asetniop.keymap = 0;
@@ -81,18 +74,9 @@ void loop()
   // DETECT KEYCHANGES:
   if (keyDiff(&asetniop, &last_asetniop))
   {
-    
-    
     // append any new keys to the chord.
     asetniop.chord |= asetniop.keymap;
     asetniop.isWord |= asetniop.spaceDown;
-
-    #ifdef DEMO
-      Serial.print("Chord: ");
-      Serial.print(asetniop.chord, BIN);
-      Serial.print("\t\tKeymap: ");
-      Serial.println(asetniop.keymap, BIN);
-    #endif
 
 
     // If no keys currently pressed
@@ -120,9 +104,6 @@ void loop()
           case NUMTOGGLE:
             asetniop.numMode = !asetniop.numMode;
             digitalWrite(LED_BUILTIN, (asetniop.numMode) ? HIGH : LOW);
-            #ifdef DEMO
-              Serial.println("NUMTOGGLE");
-            #endif
             break;
 
           default:
@@ -133,10 +114,7 @@ void loop()
         // If shiftstate is UPPER or UPPER_CYCLE, change to UPPER_CYCLE.
         // Else, change shiftstate to LOWER.
         asetniop.shiftState = (asetniop.shiftState % 0b10 == 1 ? UPPER_CYCLE : LOWER);
-        #ifdef DEMO
-          Serial.print("ShiftState: ");
-          Serial.println(asetniop.shiftState);
-        #endif
+
         asetniop.chord = 0;
         asetniop.bias = '\0';
       }
@@ -147,10 +125,6 @@ void loop()
         Keyboard.write(' ');
         asetniop.isWord = false;
       }
-
-      #ifdef DEMO
-        Serial.println("TEXT PRINTED\n");
-      #endif 
     }
 
     // SET BIAS FOR NEW CHORD:
@@ -181,10 +155,6 @@ void loop()
   if (asetniop.shiftDown != last_asetniop.shiftDown)
   {
     asetniop.shiftState = (ShiftModes)(((uint8_t)asetniop.shiftState + 1) % 4);
-    #ifdef DEMO
-      Serial.print("ShiftState: ");
-      Serial.println(asetniop.shiftState);
-    #endif
   }
 
   // this operation is performed every tick which is unecessary but it reduces code repetition
