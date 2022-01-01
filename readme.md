@@ -1,18 +1,23 @@
-# ASETNIOP
+# ASETNIOP Chorded Keyboard
+#### Video Demo:    <https://youtu.be/gwRjrKU6T-o>
+
+#### Description:
 A keyboard concept and layout designed by Zach Dennis in 2012, based on the function and setup of the virtual keyboard on his [website](https://www.asetniop.com). Its goal is to simplify typing on tablets and similar mobile devices by assigning each letter of the alphabet to a chorded pattern on the layout, where each finger has 1, and only 1 key to press. It operates similarly to a steno keyboard for stenography.
 
 My design is a hardware-based implementation of the layout for use on a PC. Existing hardware based solutions have been created in the past by other individuals utilizing libraries and tools for keyboard making, but I wanted to challenge myself to create a similar design from scratch, while improving my proficiency at programming microcontrollers, and possibly refine certain details of the layout while i'm at it. I was determined throughout the project to make it fit onto an ATMega 328p/32u4 with its 2kB of sram and 32kB of flash, and by that measure I have succeeded.
 
 
+![image](https://user-images.githubusercontent.com/33296248/147844504-969c1009-3514-4f69-a8d8-3c789d4753c4.png)
 
-## Design Considerations
+
+#### Design Considerations
 1. Design must work as a standard HID peripheral with no additional drivers. In effect, it should be plug-and-play. This almost instantly excludes certain microcontrollers that don't come equipped with hardware USB peripheral abilities. Including my original prototype board, the atmega328p used in the Arduino Uno.
 2. Due to the nature of the keyboard layout, it will be ultimately setup as a split keyboard, connected by a sort of cable between the two modules. My intention is to use a headphone cable to transmit the I2C protocol, with the right keyboard sending telemetry data back to the left side upon request to be processed. {Unable due to time, may develop as personal project}
 3. Final design should be ergonomic and have optional risers of some kind, same as a normal keyboard.
 
 
 
-## Potential Improvements:
+#### Potential Improvements:
 Though the project is technically in a working state as-is, if I work on this project in the future I may consider adding:
 * some sort of LED setup to simplify keyboard operation
 * More ergonomic layout, hand raisers. potentially a 3d printed frame with kailh choc switches
@@ -22,7 +27,7 @@ Though the project is technically in a working state as-is, if I work on this pr
 
 
 
-## Necessary Equipment
+#### Necessary Equipment
 Though I was able to get working code that i'm happy with, in my spare time I intend to create a more fleshed out design using a 3d printer.
 The specific supplies required for this project as of late are: 
 * Adafruit Itsy Bitsy 32u4 5v 
@@ -34,7 +39,7 @@ The specific supplies required for this project as of late are:
 
 
 
-## Project Complications (Ordered by resolve order/ To resolve next order)
+#### Project Complications (Ordered by resolve order/ To resolve next order)
 The ASETNIOP layout is fairly consistent in its function, but there are some discrepencies that need to be accounted for. They're listed in the order I intend to (or have) completed them.
 
 1. Initally, I had a hard time finding a reference for the chordmapping on the keyboard, especially one that I could easily convert into a format C could understand. I ended up using the JSON file from the asetniop creator's [github page](https://github.com/asetniop/Predictive), then creating a python file to transfer the data into a .ino file that Arduino's IDE can understand.
@@ -63,4 +68,4 @@ The ASETNIOP layout is fairly consistent in its function, but there are some dis
 
 6. Backspace has special requirements, though it's activated like a normal chord, which posed a challenge deciding the best way to implement it. It's activated by holding the 't' and 'p' keys at the same time (right finger on both hands). As long as you're holding both keys, i've decided it should hold the keypress so the OS can repeat the keypress as necessary. Though this is not the perfect solution as there is a chance that backspace will momentarily be pressed when typing chords composed of the same keys that backspace uses.
 
-7. UNIMPLEMENTED: The final project (If I have time) Should be a split keyboard, with a headphone jack (or other 4-pin connector most likely) transmitting I2C between the boards. I may do this after submission, because although the concept is simple, it's a new way of programming to me, designing a subhost and subperipheral for what's already a peripheral.
+7. UNIMPLEMENTED: I was unable to accomplish this in the time I gave myself but in my spare time I intend to make this into a split keyboard, with a headphone jack (or other 4-pin connector most likely) transmitting I2C between the boards. I may do this after submission, because although the concept is simple, it's a new way of programming to me, designing a subhost and subperipheral for what's already a peripheral.
