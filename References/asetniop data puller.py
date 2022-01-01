@@ -1,7 +1,7 @@
 import json
 import sys
 
-FILE = 'num.txt'
+FILE = 'num.json'
 
 DEF = ""
 lookup = [('base', 'base'), ('baseshift', 'baseshift'),('lp', 'tlp'), ('rp', 'trp'), ('lw', 'tlw'), ('rw', 'trw')]

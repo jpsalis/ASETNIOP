@@ -1,4 +1,4 @@
-#include "lookup.h"
+ #include "lookup.h"
 #include <ctype.h>
 #include <Keyboard.h>
 
@@ -35,8 +35,9 @@ void setup()
 {
   Keyboard.begin();
 
-  // DEBUG
-  Serial.begin(9600);
+  #ifdef DEMO
+    Serial.begin(9600);
+  #endif
 
   last_asetniop.chord = asetniop.chord = 0;
   last_asetniop.keymap = asetniop.keymap = 0;
@@ -119,6 +120,9 @@ void loop()
           case NUMTOGGLE:
             asetniop.numMode = !asetniop.numMode;
             digitalWrite(LED_BUILTIN, (asetniop.numMode) ? HIGH : LOW);
+            #ifdef DEMO
+              Serial.println("NUMTOGGLE");
+            #endif
             break;
 
           default:
@@ -126,10 +130,13 @@ void loop()
             putChord(asetniop, getData(asetniop.numMode, asetniop.chord));
         }
 
-        // If shiftstate is UPPER or UPPER_CYCLE, change into UPPER_CYCLE.
-        // Else, turn shiftstate to LOWER.
+        // If shiftstate is UPPER or UPPER_CYCLE, change to UPPER_CYCLE.
+        // Else, change shiftstate to LOWER.
         asetniop.shiftState = (asetniop.shiftState % 0b10 == 1 ? UPPER_CYCLE : LOWER);
-
+        #ifdef DEMO
+          Serial.print("ShiftState: ");
+          Serial.println(asetniop.shiftState);
+        #endif
         asetniop.chord = 0;
         asetniop.bias = '\0';
       }
@@ -142,7 +149,7 @@ void loop()
       }
 
       #ifdef DEMO
-        Serial.println("PRINT_EVENT");
+        Serial.println("TEXT PRINTED\n");
       #endif 
     }
 
@@ -174,6 +181,10 @@ void loop()
   if (asetniop.shiftDown != last_asetniop.shiftDown)
   {
     asetniop.shiftState = (ShiftModes)(((uint8_t)asetniop.shiftState + 1) % 4);
+    #ifdef DEMO
+      Serial.print("ShiftState: ");
+      Serial.println(asetniop.shiftState);
+    #endif
   }
 
   // this operation is performed every tick which is unecessary but it reduces code repetition
