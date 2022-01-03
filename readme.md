@@ -1,5 +1,4 @@
 # ASETNIOP Chorded Keyboard
-#### Video Demo:    <https://youtu.be/gwRjrKU6T-o>
 
 #### Description:
 A keyboard concept and layout designed by Zach Dennis in 2012, based on the function and setup of the virtual keyboard on his [website](https://www.asetniop.com). Its goal is to simplify typing on tablets and similar mobile devices by assigning each letter of the alphabet to a chorded pattern on the layout, where each finger has 1, and only 1 key to press. It operates similarly to a steno keyboard for stenography.
@@ -7,7 +6,7 @@ A keyboard concept and layout designed by Zach Dennis in 2012, based on the func
 My design is a hardware-based implementation of the layout for use on a PC. Existing hardware based solutions have been created in the past by other individuals utilizing libraries and tools for keyboard making, but I wanted to challenge myself to create a similar design from scratch, while improving my proficiency at programming microcontrollers, and possibly refine certain details of the layout while i'm at it. I was determined throughout the project to make it fit onto an ATMega 328p/32u4 with its 2kB of sram and 32kB of flash, and by that measure I have succeeded.
 
 
-![image](https://user-images.githubusercontent.com/33296248/147844504-969c1009-3514-4f69-a8d8-3c789d4753c4.png)
+![image](https://user-images.githubusercontent.com/33296248/147901579-bd6e3145-adde-4905-bbc8-30b6152ae106.png)
 
 
 #### Design Considerations
