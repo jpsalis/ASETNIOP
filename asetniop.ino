@@ -1,4 +1,4 @@
- #include "lookup.h"
+#include "lookup.h"
 #include <ctype.h>
 #include <Keyboard.h>
 /*  Layout:  
@@ -12,11 +12,10 @@
  * Right half will be the peripheral, providing keyData to left half.
  * Connection will be I^2C.
   */
-
 // PINS
 // Character name is just for reference against diagram above.
 const key keys[NUM_KEYS] = {
-  {'a', 5}, {'s', 7}, {'e', 9}, {'t', 10},
+  {'a', A4}, {'s', 7}, {'e', 9}, {'t', 10},
   {'n', A0}, {'i', A1}, {'o', A2}, {'p', A3}
 };
 
@@ -37,14 +36,17 @@ void setup()
 
   // DECLARING PINMODES:
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(shift_pin, INPUT);
-  pinMode(space_pin, INPUT);
+                                                                                                                                                                                                 
+  // SET KEYS AS ACTIVE LOW: 
+  pinMode(shift_pin, INPUT_PULLUP);
 
+  
+  pinMode(space_pin, INPUT_PULLUP);
+
+  
   for (int i = 0; i < NUM_KEYS; i++)
   {
-    pinMode(keys[i].pin, INPUT);
-    // TODO: Possibly make this a function since this line is repeated later.
-    asetniop.keymap |= digitalRead(keys[i].pin) << i;
+    pinMode(keys[i].pin, INPUT_PULLUP);    
   }
 
   // FLASH LED WHEN FINISHED SETTING UP
@@ -64,11 +66,11 @@ void loop()
   for (int i = 0; i < NUM_KEYS; i++)
   {
     // set bit in the map
-    asetniop.keymap |= digitalRead(keys[i].pin) << i;
+    asetniop.keymap |= !digitalRead(keys[i].pin) << i;
   }
 
-  asetniop.spaceDown = digitalRead(space_pin);
-  asetniop.shiftDown = digitalRead(shift_pin);
+  asetniop.spaceDown = !digitalRead(space_pin);
+  asetniop.shiftDown = !digitalRead(shift_pin);
 
 
   // DETECT KEYCHANGES:
