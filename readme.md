@@ -33,8 +33,6 @@ The specific supplies required for this project as of late are:
 * Currently nonexistant 3d-printed shell to house components
 * Keyboard switches - 10, 12?
 * Keyboard caps - 10, 12?
-* Soldering iron, flux, solder
-* A bunch of wires, resistors
 
 
 
