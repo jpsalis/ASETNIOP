@@ -8,9 +8,29 @@
 
 #include <Wire.h>
 
+struct key {
+  char name;
+  uint8_t pin;
+};
+
+const key keys[] = {
+  { 'n', 5 }, { 'i', 6 }, { 'o', 7 }, { 'p', 8 }, { ' ', 9 }
+};
+
+//space p o i n 
+//0000  0 0 0 0
+
+// Condition flipped, most signifigant digit assigned by rightmost button
+uint8_t keymap = 0;
+
+
 void setup() {
-  Wire.begin(8);  // join i2c bus with address #8
+  for(auto k : keys) {
+    pinMode(k.pin, INPUT_PULLUP);
+  }
+  Wire.begin(8);                 // join i2c bus with address #8
   Wire.onRequest(requestEvent);  // register event
+  
 }
 
 
@@ -21,6 +41,10 @@ void loop() {
 // function that executes whenever data is requested by master
 // this function is registered as an event, see setup()
 void requestEvent() {
-  Wire.write("hello ");  // respond with message of 6 bytes
-  // as expected by master
+  keymap = 0;
+  for(int i = 0; i < sizeof(keys)/sizeof(key); i++)
+  {
+    keymap |= !digitalRead(keys[i].pin) << i;
+  }
+  Wire.write(keymap);
 }

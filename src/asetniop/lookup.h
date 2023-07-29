@@ -9,7 +9,6 @@
 #define MAX_WORD_LEN 12
 #define NUM_KEYS     8
 
-
 enum specialChords {
   BACKSPACE = 0b10001000, 
   NUMTOGGLE = 0b10011001, 
